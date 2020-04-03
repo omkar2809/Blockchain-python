@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blockchain Frontend</title>
+    <style>
+        header, footer{
+            background-color: black;
+            color : white;
+            height:100px;
+            border : 5px solid black;
+        }
+        nav{
+            padding : 0;
+            background-color : black;
+            color : white;
+        }
+        nav ul li{
+            display : inline;
+            margin : 5px;
+        }
+        body{
+
+            background-color: lightgray;
+        }
+        a{
+            color : white;
+        }
+        .main_block{
+
+            padding : 10px;
+            margin : 5px;
+        }
+        article{
+            background-color: white;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1 align="center">BLOCKCHAIN CLIENT</h1>
+        <nav>
+        <ul>
+            <li><a href="/">Wallet Generator</a></li>
+            <li><a href="/make/transaction">Make Transaction</a></li>
+            <li><a href="/view/transaction">View Transaction</a></li>
+        </ul>
+    </nav>
+    </header>
+    <section class = 'main_block'>
+        <article>
+            <div align="center">
+            <h2>Wallet Generator</h2>
+            <p>Click the button to generate your blockchain wallet</p>
+            <input type="button"  value = "Generate Wallet">
+        </div>
+        </article>
+        <br>
+        <article>
+            <div align="center">
+                <h4>public key: </h4><textarea name="public_key" id="public_key" cols="70" rows="5" readonly></textarea>
+                <h4>private key: </h4><textarea name="private_key" id="private_key" cols="70" rows="5" readonly></textarea>
+                <br>
+            </div>
+        </article>
+        <br>
+        <article id="warning" style="display:none">
+            <div>
+                Important
+                <ul>
+                    <li>Save your private and public key. These keys cannot be recovered!</li>
+                    <li>Don't share your private key with anyone!</li>
+                </ul>
+            </div>
+        </article>
+    </section>
+    <footer></footer>
+    <script>
+        $(function(){
+            $('input').click(function(){
+                $.ajax({
+                    url: '/wallet/new',
+                    type: 'GET',
+                    success: function(response){
+                        document.getElementById("public_key").innerHTML = response['public_key'];
+                        document.getElementById("private_key").innerHTML = response['private_key'];
+                        document.getElementById("warning").style.display = "block";
+                    },
+                    error: function(error){
+                        consol.log(error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

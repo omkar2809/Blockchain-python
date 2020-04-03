@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blockchain Frontend</title>
+    <style>
+        header, footer{
+            background-color: black;
+            color : white;
+            height:100px;
+            border : 5px solid black;
+        }
+        nav{
+            padding : 0;
+            background-color : black;
+            color : white;
+        }
+        nav ul li{
+            display : inline;
+            margin : 5px;
+        }
+        body{
+
+            background-color: lightgray;
+        }
+        a{
+            color : white;
+        }
+        .main_block{
+
+            padding : 10px;
+            margin : 5px;
+        }
+        article{
+            background-color: white;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1 align="center">BLOCKCHAIN CLIENT</h1>
+        <nav>
+        <ul>
+            <li><a href="/">Wallet Generator</a></li>
+            <li><a href="/make/transaction">Make Transaction</a></li>
+            <li><a href="/view/transaction">View Transaction</a></li>
+        </ul>
+    </nav>
+    </header>
+    <section class = 'main_block'>
+        <article>
+            <div align="center">
+                <h3>View Transaction</h3><br>
+                <p>Enter a blockchain node URL and click on "View Transaction" button to check all transaction</p>
+                <br>
+                <form id="node_form">
+                    <label for="node_url">Node URL :</label>
+                    <input type="text" id="node_url" value="http://127.0.0.1:5001" style="width: 500px;">
+                    <br><br>
+                    <input type="button" id="view_transaction" value="View Transaction">
+                    <br>
+                </form>
+            </div>
+        </article>
+    </section>
+    <section class = 'main_block'>
+        <article>
+            <div align="center">
+                <h4>Transactions on Blockchain</h4>
+                <table id="transaction_table" cellspacing="0" width="80%" border="3">
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Sender Public Key</th>
+                            <th>Recipient Public Key</th>
+                            <th>Amount</th>
+                            <th>Timestamp</th>
+                            <th>Block No.</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </article>
+    </section>
+    <footer></footer>
+    <script>
+        $(function(){
+            $('#view_transaction').click(function(){
+                $.ajax({
+                url : document.getElementById('node_url').value + "/chain",
+                type: 'GET',
+                success: function(response){
+                   console.log(response);
+                   let count = 1;
+                   for(i = 0; i < response['length']; i++){
+                        for(j = 0;j < response['chain'][i]['transactions'].length; j++){
+
+                        var theDate = new Date(response['chain'][i]['timestamp'] * 1000);
+                        dateString = theDate.toGMTString();
+                            $('#transaction_table').append(
+                                "<tr>" +
+                                    "<td align=center>" + count + "</td>" +
+                                    "<td align=center>" + response['chain'][i]['transactions'][j]['sender_public_key'].slice(0,50) +'.....' + "</td>" +
+                                    "<td align=center>" + response['chain'][i]['transactions'][j]['recepient_public_key'].slice(0,50) +'.....' + "</td>" +
+                                    "<td align=center>" + response['chain'][i]['transactions'][j]['amount'] +"</td>" +
+                                    "<td align=center>" + dateString +"</td>" +
+                                    "<td align=center>" + response['chain'][i]['block_number'] +"</td>" +
+                                "</tr>"
+                            );
+                            count++;
+                        }
+                    }
+                },
+                error: function(error){
+                    console.log(error);
+                }
+            });
+            });
+        });
+    </script>
+</body>
+</html>

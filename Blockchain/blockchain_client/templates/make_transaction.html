@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blockchain Frontend</title>
+    <style>
+        header, footer{
+            background-color: black;
+            color : white;
+            height:100px;
+            border : 5px solid black;
+        }
+        nav{
+            padding : 0;
+            background-color : black;
+            color : white;
+        }
+        nav ul li{
+            display : inline;
+            margin : 5px;
+        }
+        body{
+
+            background-color: lightgray;
+        }
+        a{
+            color : white;
+        }
+        .main_block{
+
+            padding : 10px;
+            margin : 5px;
+        }
+        article{
+            background-color: white;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <style type="text/css">
+        form {
+            display: table;
+        }
+        .p {
+            display: table-row;
+        }
+        label, input {
+            display: table-cell;
+            margin-left: 15px;
+        }
+        #sender_public_key, #sender_private_key, #recepient_public_key, #amount{
+            width : 400px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 align="center">BLOCKCHAIN CLIENT</h1>
+        <nav>
+        <ul>
+            <li><a href="/">Wallet Generator</a></li>
+            <li><a href="/make/transaction">Make Transaction</a></li>
+            <li><a href="/view/transaction">View Transaction</a></li>
+        </ul>
+    </nav>
+    </header>
+    <section class = 'main_block' id="1stblock">
+        <article>
+            <div align="center">
+                <h2>Send Coin</h2>
+                <p> Enter Traansaction Details</p>
+                <form id='transaction_form'>
+                    <p class="p">
+                        <label for="sender_public_key"> Sender public key </label>
+                        <input type="text" name="sender_public_key" id="sender_public_key">
+                    </p> <br>
+                    <p class="p">
+                        <label for="sender_private_key"> sender private key </label>
+                        <input type="text" name="sender_private_key" id="sender_private_key">
+                    </p> <br>
+                    <p class="p">
+                        <label for="recepient_public_key"> recepient public key </label>
+                        <input type="text" name="recepient_public_key" id="recepient_public_key">
+                    </p> <br>
+                    <p class="p">
+                        <label for="amount">amount</label>
+                        <input type="text" name="amount" id="amount">
+                    </p> <br>
+                    <input type="button" id="generate_transaction" value="Generate Transaction">
+                </form>
+            </div>
+        </article>
+    </section>
+
+    <section class = 'main_block' id="2ndblock" style = "display: none;">
+        <article>
+            <div align="center">
+                <h2>Confirm your details</h2>
+                <form id='confirmation_transaction_form'>
+                    <p class="p">
+                        <label for="confirmation_sender_public_key"> Sender public key </label>
+                        <input type="text" name="confirmation_sender_public_key" id="confirmation_sender_public_key">
+                    </p> <br>
+                    <!--
+                    <p class="p">
+                        <label for="confirmation_sender_private_key"> sender private key </label>
+                        <input type="text" name="confirmation_sender_private_key" id="confirmation_sender_private_key" readonly>
+                    </p> <br>
+                    -->
+                    <p class="p">
+                        <label for="confirmation_recepient_public_key"> recepient public key </label>
+                        <input type="text" name="confirmation_recepient_public_key" id="confirmation_recepient_public_key" readonly>
+                    </p> <br>
+                    <p class="p">
+                        <label for="confirmation_amount">amount</label>
+                        <input type="text" name="confirmation_amount" id="confirmation_amount" readonly>
+                    </p> <br>
+                    <p class="p">
+                        <label for="signature">signature</label>
+                        <input type="text" name="signature" id="signature" readonly>
+                    </p> <br>
+                    <p class="p">
+                        <label for="node_url">Node</label>
+                        <input type="text" name="node_url" id="node_url" value="http://127.0.0.1:5001">
+                    </p> <br>
+                    <input type="button" id="confirmation_generate_transaction" value="confirm">
+                </form>
+            </div>
+        </article>
+    </section>
+
+    <footer></footer>
+    <script>
+    $(function(){
+        $("#generate_transaction").click(function(){
+            $.ajax({
+                url: "/generate/transaction",
+                type: "POST",
+                dataType: 'json',
+                data: $("#transaction_form").serialize(),
+                success: function(response){
+                    console.log(response);
+                    document.getElementById("1stblock").style.display = "none";
+                    document.getElementById("2ndblock").style.display = "block";
+
+                    document.getElementById("confirmation_sender_public_key").value = response['transaction']['sender_public_key'];
+                    //document.getElementById("confirmation_sender_private_key").value = response['transaction']['sender_private_key'];
+                    document.getElementById("confirmation_recepient_public_key").value = response['transaction']['recepient_public_key'];
+                    document.getElementById("confirmation_amount").value = response['transaction']['amount'];
+                    document.getElementById("signature").value = response['signature'];
+
+                },
+                error: function(error){
+                    console.log(error);
+                }
+
+            });
+        });
+        $('#confirmation_generate_transaction').click(function(){
+            $.ajax({
+                url: document.getElementById('node_url').value + '/transaction/new',
+                type: 'POST',
+                header: {'Access-Control-Allow-Origin': '*'},
+                dataType: 'json',
+                data: $('#confirmation_transaction_form').serialize(),
+                success: function(response){
+                        /*
+                        $('#sender_public_key').val('');
+                        $('#sender_private_key').val('');
+                        $('#recepient_public_key').val('');
+                        $('#amount').val('');
+                        */
+                        document.getElementById("2ndblock").style.display = "none";
+                        document.getElementById("1stblock").style.display = "block";
+                        alert("Successfully transaction added in block");
+                },
+                error: function(error){
+                    console.log(error);
+                }
+            });
+        });
+    });
+    </script>
+</body>
+</html>

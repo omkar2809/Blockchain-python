@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Blockchain Frontend</title>
+    <style>
+        header, footer{
+            background-color: black;
+            color : white;
+            height:100px;
+            border : 5px solid black;
+        }
+        nav{
+            padding : 0;
+            background-color : black;
+            color : white;
+        }
+        nav ul li{
+            display : inline;
+            margin : 5px;
+        }
+        body{
+
+            background-color: lightgray;
+        }
+        a{
+            color : white;
+        }
+        .main_block{
+
+            padding : 10px;
+            margin : 5px;
+        }
+        article{
+            background-color: white;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1 align="center">BLOCKCHAIN CLIENT</h1>
+        <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/configure">Configure</a></li>
+        </ul>
+    </nav>
+    </header>
+    <section class = 'main_block'>
+        <article>
+            <div align="center">
+                <h2> Add Blockchain Nodes</h2>
+                <br>
+                <h4>Enter a list of Blockchain node URLs separated by comma and click on "Add" button to add them to list of nodes</h4>
+                <br>
+                <form id="node_form">
+                    <label for="nodes">Node URLs :</label>
+                    <input type="text" name="nodes" class="nodes" id="nodes" style="width:500px;">
+                    <br>
+                    <br>
+                    <input type="button" id="add_button" value="Add Node">
+                </form>
+            </div>
+            <br>
+            <br>
+            <div align="center">
+                <h4>This node can retrive Blockchain data from the following nodes:</h4>
+                <br>
+                <div id="list_nodes">
+
+                </div>
+            </div>
+        </article>
+    </section>
+    <footer></footer>
+    <script>
+        $(function(){
+            $("#add_button").click(function(){
+                $.ajax({
+                        url: '/nodes/register',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: $("#node_form").serialize(),
+                        success: function(response){
+                            document.getElementById('nodes').value = " ";
+                            window.location.reload();
+                        },
+                        error: function(error){
+                            console.log(error);
+                        }
+                });
+            });
+
+            $.ajax({
+                url:'/nodes/get',
+                type: 'GET',
+                success: function(response){
+                    for(i = 0; i < response['nodes'].length; i++){
+                        //nodes = "<li><a href=http//" + response['nodes'][i] + "></a></li>";
+                        //document.getElementById('#list_nodes').innerHTML += nodes;
+                        $('#list_nodes').append(
+                            "<li><a href=http//" + response['nodes'][i] + " style= color:black;>" + response['nodes'][i] + "</a></li><br>"
+                        );
+                    }
+                },
+                error: function(error){
+                    console.log(error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
